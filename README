@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-README.MD
-=======
-readme
->>>>>>> b8a84deb8550e22e96d651ae87e6046748228509
+If you want to embed images, this is how you do it:
+
+![Image of Yaktocat](https://octodex.github.com/images/yaktocat.png)
