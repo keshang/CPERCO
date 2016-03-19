@@ -49,7 +49,7 @@ public class BNPP {
 
 			for(int i=0; i<n; i++) {
 						obj.addTerm(P[i],z[i]);
-				obj.addTerm(-theta*(0.25*C[i]*C[i]), x[i]);
+				//obj.addTerm(-theta*(0.25*C[i]*C[i]), x[i]);
 			}
 			
 			cplex.addMaximize(obj);
@@ -171,7 +171,7 @@ public class BNPP {
 			//	System.out.println("deviations " + deviations[i]);
 
 			//ConnectR connection = new ConnectR();
-			for (int i=0; i<1; i++)
+			for (int i=0; i<4; i++)
 				PCV[i] = connection.connectToR(deviations,value,i);
 			for(int i=0; i<n; i++) {
 				OV += cplex.getValue(z[i])*P[i];
@@ -204,6 +204,6 @@ public class BNPP {
 
 	public static void main(String[] args) throws IOException, REXPMismatchException, REngineException {
 		ConnectR connection = new ConnectR();
-		BN(0, connection);
+		BN(2.06, connection);
 	}
 }

@@ -12,11 +12,11 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class PPExtra {
+public class CheckPP {
 
 	public static List<Integer> Items = new LinkedList<>();
 	
-	public static double[] PP(double epsilon) throws IOException{
+	public static double[] PP(double epsilon, ConnectR connection) throws IOException, REXPMismatchException, REngineException {
         double OV = 0;
 		double[] PCV = {0,0,0,0,0};
         try {
@@ -46,14 +46,25 @@ public class PPExtra {
 			IloLinearNumExpr obj = cplex.linearNumExpr();
 
 			for(int i=0; i<n; i++) {
-				obj.addTerm(P[i],z[i]);
+				obj.addTerm(-(C[i]+(epsilon)*0.5*C[i]), x[i]);
+				obj.addTerm(-V[i],y[i]);
 			}
+			//obj.addTerm(1,x[5]);
+			//obj.addTerm(1,z[1]);
+			//obj.addTerm(1,x[4]);
+			//obj.addTerm(1,x[5]);
 			
 			cplex.addMaximize(obj);
 
 			//constraints
 			//0
 			IloLinearNumExpr constraint, constraint1;
+
+			constraint = cplex.linearNumExpr();
+			for(int i=0; i<n; i++) {
+				constraint.addTerm(P[i], z[i]);
+			}
+			cplex.addGe(constraint,1208870.9677419355);
 
 			//1
 			constraint = cplex.linearNumExpr();
@@ -106,7 +117,7 @@ public class PPExtra {
 					System.out.println("x" + i + "=" + cplex.getValue(x[i]));
 					System.out.println("y" + i + "=" + cplex.getValue(y[i]));
 					System.out.println("z" + i + "=" + cplex.getValue(z[i]));
-					if (cplex.getValue(x[i]) != 0.0) {
+					if (cplex.getValue(x[i]) > 0.0) {
 						length++;
 						Items.add(i);
 					}
@@ -141,7 +152,8 @@ public class PPExtra {
 			//	System.out.println("deviations " + deviations[i]);
 
 			//ConnectR connection = new ConnectR();
-
+			for (int i=0; i<1; i++)
+				PCV[i] = connection.connectToR(deviations,value,i);
 
 			for(int i=0; i<n; i++) {
 				OV += cplex.getValue(z[i])*P[i];
@@ -175,6 +187,7 @@ public class PPExtra {
 
 
 	public static void main(String[] args) throws IOException, REXPMismatchException, REngineException {
-		PP(0);
+		ConnectR connection = new ConnectR();
+		PP(6, connection);
 	}
 }

@@ -12,11 +12,11 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class PPExtra {
+public class CheckBSPP {
 
 	public static List<Integer> Items = new LinkedList<>();
 	
-	public static double[] PP(double epsilon) throws IOException{
+	public static double[] BS(double Gamma, ConnectR connection) throws IOException, REXPMismatchException, REngineException {
         double OV = 0;
 		double[] PCV = {0,0,0,0,0};
         try {
@@ -33,37 +33,57 @@ public class PPExtra {
 			double Zero[] = {0,0,0,0,0,0};
 
 			int n = 6;
-			double theta = 0.00001;
-
+			double theta = 0.000000001;
 			//
 			//IloNumVar[] x = cplex.boolVarArray(n);
 			IloNumVar[] z = cplex.numVarArray(n, Zero, D);
 			IloNumVar[] x = cplex.numVarArray(n, Zero, U);
 			IloNumVar[] y = cplex.numVarArray(n, 0, Double.MAX_VALUE);
-			IloNumVar zz = cplex.numVar(1,1);
+
+			IloNumVar[] p = cplex.numVarArray(n,0,Double.MAX_VALUE);
+			IloNumVar zz = cplex.numVar(0,Double.MAX_VALUE);
 
 			//objective
 			IloLinearNumExpr obj = cplex.linearNumExpr();
 
 			for(int i=0; i<n; i++) {
-				obj.addTerm(P[i],z[i]);
+				obj.addTerm(C[i], x[i]);
+				obj.addTerm(-V[i],y[i]);
+				obj.addTerm(1,p[i]);
+				//obj.addTerm(-theta*(0.25*C[i]*C[i]), x[i]);
 			}
-			
+			obj.addTerm(-Gamma,zz);
 			cplex.addMaximize(obj);
 
 			//constraints
 			//0
 			IloLinearNumExpr constraint, constraint1;
 
+			constraint = cplex.linearNumExpr();
+			for(int i=0; i<n; i++) {
+				constraint.addTerm(P[i], z[i]);
+			}
+			cplex.addGe(constraint,2340125.0);
+
+			for(int i=0; i<n; i++)
+			{
+				constraint = cplex.linearNumExpr();
+				constraint.addTerm(1, p[i]);
+				constraint.addTerm(-0.5*C[i],x[i]);
+				constraint.addTerm(1,zz);
+				cplex.addGe(constraint,0);
+			}
+
 			//1
 			constraint = cplex.linearNumExpr();
 
 			for(int i=0; i<n; i++)
 			{
-					constraint.addTerm(C[i], x[i]);
-					constraint.addTerm(epsilon*0.5*C[i],x[i]);
-					constraint.addTerm(V[i],y[i]);
+				constraint.addTerm(C[i], x[i]);
+				constraint.addTerm(V[i],y[i]);
+				constraint.addTerm(1,p[i]);
 			}
+			constraint.addTerm(Gamma,zz);
 			//constraint.addTerm(Gamma,z);
 			cplex.addLe(constraint, 400000);
 
@@ -100,13 +120,11 @@ public class PPExtra {
 			//solve
 			int length = 0;
 			if(cplex.solve())
-			//if(cplex.populate())
 			{
 				for(int i=0; i<n; i++) {
-					System.out.println("x" + i + "=" + cplex.getValue(x[i]));
-					System.out.println("y" + i + "=" + cplex.getValue(y[i]));
-					System.out.println("z" + i + "=" + cplex.getValue(z[i]));
-					if (cplex.getValue(x[i]) != 0.0) {
+					//System.out.println("x :" + cplex.getValue(x[i]));
+					//System.out.println("y :" + cplex.getValue(y[i]));
+					if (cplex.getValue(x[i]) > 0.1) {
 						length++;
 						Items.add(i);
 					}
@@ -114,6 +132,7 @@ public class PPExtra {
 				}
 				//visualization.repaint();
 			}
+
 			//System.out.println("the value of z :" + cplex.getValue(z));
 
 			double dis = 0;
@@ -128,9 +147,12 @@ public class PPExtra {
 			int index = 0;
 			for(Integer arc : Items) {
 				deviations[index] = 0.5*C[arc]*cplex.getValue(x[arc]);
-				//System.out.println(cplex.getValue(x[arc]));
+				System.out.println(deviations[index]);
 				index++;
+
 			}
+			System.out.println(dis);
+
 
 			//double nominalDistance = nominalDis(cplex);
 			//double[] deviations = KPData.getDeviations(Items, length);
@@ -141,17 +163,16 @@ public class PPExtra {
 			//	System.out.println("deviations " + deviations[i]);
 
 			//ConnectR connection = new ConnectR();
-
-
+			for (int i=0; i<4; i++)
+				PCV[i] = connection.connectToR(deviations,value,i);
+			//PCV = connection.connectToR(deviations,value);
 			for(int i=0; i<n; i++) {
 				OV += cplex.getValue(z[i])*P[i];
 				//obj.addTerm(P[i], z[i]);
 			}
 
-            //OV = cplex.getObjValue();
 
-
-			System.out.println("epsilon: " + epsilon);
+			System.out.println("Gamma: " + Gamma);
 			System.out.println();
 			System.out.println("Objective Value: " + OV);
 			System.out.println();
@@ -163,7 +184,7 @@ public class PPExtra {
 			//System.out.println("robust distance: " + orienteering.ReadData.robustDis(arcs));
 			//end
 			cplex.end();
-			
+
 		} catch (IloException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -173,8 +194,8 @@ public class PPExtra {
         return pair;
 	}
 
-
 	public static void main(String[] args) throws IOException, REXPMismatchException, REngineException {
-		PP(0);
+		ConnectR connection = new ConnectR();
+		BS(4.613, connection);
 	}
 }

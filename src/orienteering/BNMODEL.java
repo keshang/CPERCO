@@ -23,7 +23,7 @@ public class BNMODEL {
 			cplex.setOut(null);
 			cplex.setParam(IloCplex.DoubleParam.SolnPoolGap,0);
 			cplex.setParam(IloCplex.IntParam.SolnPoolIntensity,4);
-			cplex.setParam(IloCplex.IntParam.PopulateLim,20);
+			cplex.setParam(IloCplex.IntParam.PopulateLim,1000000000);
 
 			double Tmax = ReadData.Tmax;
 			int n = ReadData.mNumRequests;
@@ -61,11 +61,11 @@ public class BNMODEL {
 					if(j!=i) {
 						obj.addTerm(b[i], x[i][j]);
 						//obj.addTerm(-theta * (deviation[i][j] * deviation[i][j]), y[i][j]);
-						obj.addTerm(-theta*distance[i][j], x[i][j]);
-						obj.addTerm(-theta*deviation[i][j], y[i][j]);
+						//obj.addTerm(-theta*distance[i][j], x[i][j]);
+						//obj.addTerm(-theta*deviation[i][j], y[i][j]);
 					}
 			}
-			obj.addTerm(-theta*rho,zz);
+			//obj.addTerm(-theta*rho,zz);
 			cplex.addMaximize(obj);
 
 			//constraints
@@ -169,7 +169,7 @@ public class BNMODEL {
 
 			//cplex.exportModel("model.lp");
 			//solve
-
+/*
 			int length = 0;
 			if(cplex.solve())
 			{
@@ -193,11 +193,11 @@ public class BNMODEL {
 			double[] value = {nominalDistance - Tmax};
 
 			//util.ConnectR connection = new util.ConnectR();
-			for (int i=0; i<5; i++)
+			for (int i=0; i<4; i++)
 				PCV[i] = connection.connectToR(deviations,value,i);
 			OV = ReadData.getObjValue(arcs);
+*/
 
-/*
 			double[] MinPCV = {Double.MAX_VALUE,Double.MAX_VALUE,Double.MAX_VALUE,Double.MAX_VALUE,Double.MAX_VALUE};
 			int solIndex = 0;
 			if(cplex.populate()) {
@@ -222,7 +222,7 @@ public class BNMODEL {
 						double[] deviations = ReadData.getDeviations(arcs, length);
 						double[] value = {nominalDistance- ReadData.Tmax};
 
-						for (int i=0; i<5; i++)
+						for (int i=0; i<4; i++)
 							PCV[i] = connection.connectToR(deviations,value,i);
 					}
 
@@ -237,13 +237,13 @@ public class BNMODEL {
 
 			OV = cplex.getObjValue();
 			PCV = MinPCV;
-*/
+
 
 			System.out.println("rho: " + rho);
 			System.out.println();
 			System.out.println("Objective Value: " + OV);
 			System.out.println();
-			//System.out.println("PCV: " + PCV );
+			System.out.println("PCV: " + PCV[0] );
 			System.out.println();
 			System.out.println("-----------------------------------------------");
 			System.out.println();

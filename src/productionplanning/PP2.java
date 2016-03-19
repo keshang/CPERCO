@@ -21,7 +21,7 @@ public class PP2 {
 			Items.clear();
 
 			IloCplex cplex = new IloCplex();
-			cplex.setOut(null);
+			//cplex.setOut(null);
 
 			double P[] = {180,180,250,270,300,320};
 			double C[] = {20,25,30,40,50,60};
@@ -120,6 +120,9 @@ public class PP2 {
 			if(cplex.solve())
 			{
 				for(int i=0; i<n; i++) {
+					System.out.println("x" + i + "=" + cplex.getValue(x[i]));
+					System.out.println("y" + i + "=" + cplex.getValue(y[i]));
+					System.out.println("z" + i + "=" + cplex.getValue(z[i]));
 					if (cplex.getValue(x[i]) > 0.001) {
 						length++;
 						Items.add(i);
@@ -142,7 +145,7 @@ public class PP2 {
 			int index = 0;
 			for(Integer arc : Items) {
 				deviations[index] = 0.5*C[arc]*cplex.getValue(x[arc]);
-				System.out.println(cplex.getValue(x[arc]));
+				//System.out.println(cplex.getValue(x[arc]));
 				index++;
 			}
 
@@ -155,13 +158,13 @@ public class PP2 {
 			//	System.out.println("deviations " + deviations[i]);
 
 			//ConnectR connection = new ConnectR();
-			for (int i=0; i<5; i++)
-				PCV[i] = connection.connectToR(deviations,value,i);
+			for (int i=0; i<2; i++)
+				PCV[i] = connection.connectToR(deviations,value,i+5);
 			for(int i=0; i<n; i++) {
 				OV += cplex.getValue(z[i])*P[i];
 				//obj.addTerm(P[i], z[i]);
 			}
-
+			//OV=cplex.getObjValue();
 
 			System.out.println("rho: " + rho);
 			System.out.println();
@@ -188,7 +191,7 @@ public class PP2 {
 
 	public static void main(String[] args) throws IOException, REXPMismatchException, REngineException {
 		ConnectR connection = new ConnectR();
-		PP2(0, connection);
+		PP2(10.87, connection);
 		//double[][] a = {{1,2,3},{4,5,6}};
 		//System.out.println(a[1].length);
 	}

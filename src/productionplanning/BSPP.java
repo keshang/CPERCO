@@ -48,7 +48,7 @@ public class BSPP {
 
 			for(int i=0; i<n; i++) {
 				obj.addTerm(P[i],z[i]);
-				obj.addTerm(-theta*(0.25*C[i]*C[i]), x[i]);
+				//obj.addTerm(-theta*(0.25*C[i]*C[i]), x[i]);
 			}
 
 			cplex.addMaximize(obj);
@@ -114,6 +114,8 @@ public class BSPP {
 			if(cplex.solve())
 			{
 				for(int i=0; i<n; i++) {
+					//System.out.println("x :" + cplex.getValue(x[i]));
+					//System.out.println("y :" + cplex.getValue(y[i]));
 					if (cplex.getValue(x[i]) > 0.1) {
 						length++;
 						Items.add(i);
@@ -122,6 +124,7 @@ public class BSPP {
 				}
 				//visualization.repaint();
 			}
+
 			//System.out.println("the value of z :" + cplex.getValue(z));
 
 			double dis = 0;
@@ -136,8 +139,12 @@ public class BSPP {
 			int index = 0;
 			for(Integer arc : Items) {
 				deviations[index] = 0.5*C[arc]*cplex.getValue(x[arc]);
+				//System.out.println(deviations[index]);
 				index++;
+
 			}
+			//System.out.println(dis);
+
 
 			//double nominalDistance = nominalDis(cplex);
 			//double[] deviations = KPData.getDeviations(Items, length);
@@ -148,8 +155,8 @@ public class BSPP {
 			//	System.out.println("deviations " + deviations[i]);
 
 			//ConnectR connection = new ConnectR();
-			for (int i=0; i<1; i++)
-				PCV[i] = connection.connectToR(deviations,value,4);
+			for (int i=0; i<4; i++)
+				PCV[i] = connection.connectToR(deviations,value,i);
 			//PCV = connection.connectToR(deviations,value);
 			for(int i=0; i<n; i++) {
 				OV += cplex.getValue(z[i])*P[i];
@@ -161,7 +168,7 @@ public class BSPP {
 			System.out.println();
 			System.out.println("Objective Value: " + OV);
 			System.out.println();
-			System.out.println("PCV: " + PCV );
+			System.out.println("PCV: " + PCV[0] );
 			System.out.println();
 			System.out.println("-----------------------------------------------");
 			System.out.println();
@@ -181,6 +188,6 @@ public class BSPP {
 
 	public static void main(String[] args) throws IOException, REXPMismatchException, REngineException {
 		ConnectR connection = new ConnectR();
-		BS(1, connection);
+		BS(4.62, connection);
 	}
 }

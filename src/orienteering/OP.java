@@ -22,7 +22,7 @@ public class OP {
 			cplex.setOut(null);
 			cplex.setParam(IloCplex.DoubleParam.SolnPoolGap,0);
 			cplex.setParam(IloCplex.IntParam.SolnPoolIntensity,4);
-			cplex.setParam(IloCplex.IntParam.PopulateLim,100);
+			cplex.setParam(IloCplex.IntParam.PopulateLim,1000000000);
 
 			int n = ReadData.mNumRequests;
 			double xPos[] = ReadData.xPos;
@@ -131,7 +131,7 @@ public class OP {
 			}
 
 			//solve
-
+/*
 			int length = 0;
 			if(cplex.solve())
 			{
@@ -147,11 +147,11 @@ public class OP {
 			double[] deviations = ReadData.getDeviations(arcs, length);
 			double[] value = {nominalDistance - Tmax};
 
-			for (int i=0; i<5; i++)
+			for (int i=0; i<4; i++)
 				PCV[i] = connection.connectToR(deviations,value,i+5);
 			OV = ReadData.getObjValue(arcs);
+*/
 
-/*
 
 			double[] MinPCV = {Double.MAX_VALUE,Double.MAX_VALUE,Double.MAX_VALUE,Double.MAX_VALUE,Double.MAX_VALUE};
 			int solIndex = 0;
@@ -176,8 +176,8 @@ public class OP {
 						double nominalDistance = ReadData.nominalDis(arcs);
 						double[] deviations = ReadData.getDeviations(arcs, length);
 						double[] value = {nominalDistance- ReadData.Tmax};
-						for (int i=0; i<5; i++)
-							PCV[i] = connection.connectToR(deviations,value,i+5);
+						for (int i=0; i<4; i++)
+							PCV[i] = connection.connectToR(deviations,value,i);
 						//System.out.println(PCV);
 					}
 					for (int i=0; i<5; i++) {
@@ -191,14 +191,14 @@ public class OP {
 
 			OV = cplex.getObjValue();
 			PCV = MinPCV;
-*/
+
 			//OV = orienteering.ReadData.getObjValue(arcs);
 
 			System.out.println("epsilon: " + epsilon);
 			System.out.println();
 			System.out.println("Objective Value: " + OV);
 			System.out.println();
-			//System.out.println("PCV: " + PCV );
+			System.out.println("PCV: " + PCV[0] );
 			System.out.println();
 			System.out.println("-----------------------------------------------");
 			System.out.println();

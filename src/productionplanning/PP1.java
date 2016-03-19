@@ -150,8 +150,8 @@ public class PP1 {
 			//	System.out.println("deviations " + deviations[i]);
 
 			//ConnectR connection = new ConnectR();
-			for (int i=0; i<5; i++)
-				PCV[i] = connection.connectToR(deviations,value,i);
+			for (int i=0; i<2; i++)
+				PCV[i] = connection.connectToR(deviations,value,i+5);
 			for(int i=0; i<n; i++) {
 				OV += cplex.getValue(z[i])*P[i];
 				//obj.addTerm(P[i], z[i]);
@@ -182,6 +182,6 @@ public class PP1 {
 
 	public static void main(String[] args) throws IOException, REXPMismatchException, REngineException {
 		ConnectR connection = new ConnectR();
-		PP1(0, connection);
+		PP1(0.13, connection);
 	}
 }

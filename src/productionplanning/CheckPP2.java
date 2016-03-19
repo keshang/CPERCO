@@ -3,6 +3,7 @@ package productionplanning;
 import ilog.concert.IloException;
 import ilog.concert.IloLinearNumExpr;
 import ilog.concert.IloNumVar;
+import ilog.concert.IloQuadNumExpr;
 import ilog.cplex.IloCplex;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
@@ -12,11 +13,11 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class PPExtra {
+public class CheckPP2 {
 
 	public static List<Integer> Items = new LinkedList<>();
 	
-	public static double[] PP(double epsilon) throws IOException{
+	public static double[] PP2(double rho, ConnectR connection) throws IOException, REXPMismatchException, REngineException {
         double OV = 0;
 		double[] PCV = {0,0,0,0,0};
         try {
@@ -26,6 +27,7 @@ public class PPExtra {
 			cplex.setOut(null);
 
 			double P[] = {180,180,250,270,300,320};
+			double Q[] = {200,180,250,270,300,320};
 			double C[] = {20,25,30,40,50,60};
 			double V[] = {2,2,2,2,2,2};
 			double U[] = {1500,2000,2200,3000,2700,2500};
@@ -34,20 +36,25 @@ public class PPExtra {
 
 			int n = 6;
 			double theta = 0.00001;
-
 			//
-			//IloNumVar[] x = cplex.boolVarArray(n);
 			IloNumVar[] z = cplex.numVarArray(n, Zero, D);
 			IloNumVar[] x = cplex.numVarArray(n, Zero, U);
 			IloNumVar[] y = cplex.numVarArray(n, 0, Double.MAX_VALUE);
-			IloNumVar zz = cplex.numVar(1,1);
+
+			//IloNumVar[] yy = cplex.numVarArray(n,Zero,U);
+			//IloNumVar[] zz = cplex.numVarArray(n,Zero,U);
+			IloNumVar zzz = cplex.numVar(0,Double.MAX_VALUE);
 
 			//objective
 			IloLinearNumExpr obj = cplex.linearNumExpr();
 
 			for(int i=0; i<n; i++) {
-				obj.addTerm(P[i],z[i]);
+				//obj.addTerm(P[i],z[i]);
+				obj.addTerm(-C[i], x[i]);
+				obj.addTerm(-V[i],y[i]);
+				//obj.addTerm(-1,x[1]);
 			}
+			obj.addTerm(-rho/2,zzz);
 			
 			cplex.addMaximize(obj);
 
@@ -55,17 +62,40 @@ public class PPExtra {
 			//0
 			IloLinearNumExpr constraint, constraint1;
 
+			IloQuadNumExpr constraint3;
+
+			constraint = cplex.linearNumExpr();
+			for(int i=0; i<n; i++) {
+				constraint.addTerm(P[i], z[i]);
+			}
+			cplex.addGe(constraint,2839201.69378843);
+
 			//1
 			constraint = cplex.linearNumExpr();
 
 			for(int i=0; i<n; i++)
 			{
 					constraint.addTerm(C[i], x[i]);
-					constraint.addTerm(epsilon*0.5*C[i],x[i]);
+				    //constraint.addTerm(0.5*C[i],yy[i]);
 					constraint.addTerm(V[i],y[i]);
 			}
+			constraint.addTerm(rho,zzz);
 			//constraint.addTerm(Gamma,z);
 			cplex.addLe(constraint, 400000);
+
+
+			constraint3 = cplex.quadNumExpr();
+
+			for(int i=0; i<n; i++)
+			{
+				constraint3.addTerm(0.25*C[i]*C[i],x[i],x[i]);
+			}
+
+			constraint3.addTerm(-1.0, zzz, zzz);
+
+
+			cplex.addLe(constraint3,0);
+
 
 			//2
 			constraint = cplex.linearNumExpr();
@@ -95,18 +125,16 @@ public class PPExtra {
 			cplex.addEq(constraint, 500);
 
 			//5
-
-
+			//cplex.setParam(IloCplex.IntParam.RootAlg,4);
 			//solve
 			int length = 0;
 			if(cplex.solve())
-			//if(cplex.populate())
 			{
 				for(int i=0; i<n; i++) {
 					System.out.println("x" + i + "=" + cplex.getValue(x[i]));
 					System.out.println("y" + i + "=" + cplex.getValue(y[i]));
 					System.out.println("z" + i + "=" + cplex.getValue(z[i]));
-					if (cplex.getValue(x[i]) != 0.0) {
+					if (cplex.getValue(x[i]) > 0.001) {
 						length++;
 						Items.add(i);
 					}
@@ -141,17 +169,17 @@ public class PPExtra {
 			//	System.out.println("deviations " + deviations[i]);
 
 			//ConnectR connection = new ConnectR();
-
-
+			for (int i=0; i<5; i++)
+				PCV[i] = connection.connectToR(deviations,value,i);
 			for(int i=0; i<n; i++) {
 				OV += cplex.getValue(z[i])*P[i];
 				//obj.addTerm(P[i], z[i]);
 			}
 
-            //OV = cplex.getObjValue();
+			//OV = cplex.getObjValue();
 
 
-			System.out.println("epsilon: " + epsilon);
+			System.out.println("rho: " + rho);
 			System.out.println();
 			System.out.println("Objective Value: " + OV);
 			System.out.println();
@@ -175,6 +203,9 @@ public class PPExtra {
 
 
 	public static void main(String[] args) throws IOException, REXPMismatchException, REngineException {
-		PP(0);
+		ConnectR connection = new ConnectR();
+		PP2(0.0834495503553387, connection);
+		//double[][] a = {{1,2,3},{4,5,6}};
+		//System.out.println(a[1].length);
 	}
 }

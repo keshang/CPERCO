@@ -42,6 +42,9 @@ public class ConnectR {
                 case 0: {//Uniform
                     c.eval("source(\"E:/sk/Cplex/R/pcv2.R\")");
                     x = c.eval("pcv");
+                    //c.eval("U<-0");
+                    //c.eval("for(deviate in deviations){U<-Unif(-deviate,deviate)+U}");
+                    //x = c.eval("p(U)(value)");
                     break;
                 }
                 case 1: {//Triangular

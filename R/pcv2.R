@@ -22,4 +22,4 @@ for(p in 0:l) {
 
 pcv <- pcv/(factorial(l)*(2^l)*prod(deviations))
 
-cat(pcv)
+#cat(pcv)

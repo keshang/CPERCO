@@ -23,7 +23,7 @@ public class PP {
 			Items.clear();
 
 			IloCplex cplex = new IloCplex();
-			cplex.setOut(null);
+			//cplex.setOut(null);
 
 			double P[] = {180,180,250,270,300,320};
 			double C[] = {20,25,30,40,50,60};
@@ -112,7 +112,7 @@ public class PP {
 					System.out.println("x" + i + "=" + cplex.getValue(x[i]));
 					System.out.println("y" + i + "=" + cplex.getValue(y[i]));
 					System.out.println("z" + i + "=" + cplex.getValue(z[i]));
-					if (cplex.getValue(x[i]) != 0.0) {
+					if (cplex.getValue(x[i]) > 0.0) {
 						length++;
 						Items.add(i);
 					}
@@ -147,8 +147,9 @@ public class PP {
 			//	System.out.println("deviations " + deviations[i]);
 
 			//ConnectR connection = new ConnectR();
-			for (int i=0; i<1; i++)
+			for (int i=0; i<4; i++) {
 				PCV[i] = connection.connectToR(deviations,value,i);
+			}
 
 			for(int i=0; i<n; i++) {
 				OV += cplex.getValue(z[i])*P[i];
@@ -183,6 +184,6 @@ public class PP {
 
 	public static void main(String[] args) throws IOException, REXPMismatchException, REngineException {
 		ConnectR connection = new ConnectR();
-		PP(0, connection);
+		PP(6, connection);
 	}
 }

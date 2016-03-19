@@ -1,7 +1,10 @@
-package productionplanning;
+package eprodemo;
 
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
+import productionplanning.BNPP;
+import productionplanning.BSPP;
+import productionplanning.PP;
 import util.ConnectR;
 
 import java.io.IOException;
@@ -10,7 +13,7 @@ import java.io.IOException;
 /**
  * Created by shangke on 11/3/15.
  */
-public class RobustPP {
+public class main {
 
     public static void main(String[] args) throws IOException, REXPMismatchException, REngineException {
 
@@ -18,7 +21,7 @@ public class RobustPP {
         ConnectR connection = new ConnectR();
         int mNum = 6;
         int distributionNum = 5;
-        int num = 500;
+        int num = 20;
         double[] Gamma = new double[num];
         double[] rho = new double[num];
         double[] rsDe = new double[num];
@@ -28,7 +31,7 @@ public class RobustPP {
             //rho[i] = (double) i / (Gamma.length - 1)* 10.87;
             //rsDe[i] = (double) i / (Gamma.length - 1) * 6;
 
-            Gamma[i] = (double) i / (Gamma.length - 1) * 4.62;
+            Gamma[i] = (double) i / (Gamma.length - 1) * 1;
             rho[i] = (double) i / (Gamma.length - 1)* 2.07;
             rsDe[i] = (double) i / (Gamma.length - 1);
         }
@@ -75,15 +78,15 @@ public class RobustPP {
                 }
             }
 
-            String BSFile = head + "BS_" + seed + tail;
+            String BSFile = head + "model1_" + seed + tail;
             String BNFile = head + "BN_" + seed + tail;
-            String KPFile = head + "KP_" + seed + tail;
+            String KPFile = head + "model_" + seed + tail;
 
 
 
             zeroCount = 0;
             for (int i = 0; i < Gamma.length; i++) {
-                pair = BSPP.BS(Gamma[i], connection);
+                pair = model1.BS(Gamma[i], connection);
                 BSparam[i] = Gamma[i];
                 BSOV[i] = pair[0];
                 for (int j=0; j<distributionNum; j++) {
@@ -95,7 +98,7 @@ public class RobustPP {
             connection.transferDataToR(BSparam, BSOV, BSPCV, BSFile);
 
 
-
+/*
             zeroCount = 0;
             for (int i = 0; i < rho.length; i++) {
                 pair = BNPP.BN(rho[i], connection);
@@ -109,11 +112,11 @@ public class RobustPP {
             }
             connection.transferDataToR(BNparam, BNOV, BNPCV, BNFile);
 
-
+*/
 
             zeroCount = 0;
             for (int i = 0; i < rsDe.length; i++) {
-                pair = PP.PP(rsDe[i], connection);
+                pair = model.PP(rsDe[i], connection);
                 KPparam[i] = rsDe[i];
                 KPOV[i] = pair[0];
                 for (int j=0; j<distributionNum; j++) {

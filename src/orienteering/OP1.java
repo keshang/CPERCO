@@ -26,7 +26,7 @@ public class OP1 {
 			cplex.setOut(null);
 			cplex.setParam(IloCplex.DoubleParam.SolnPoolGap,0);
 			cplex.setParam(IloCplex.IntParam.SolnPoolIntensity,4);
-			cplex.setParam(IloCplex.IntParam.PopulateLim,100);
+			cplex.setParam(IloCplex.IntParam.PopulateLim,1000000000);
 
 			double Tmax = ReadData.Tmax;
 			int n = ReadData.mNumRequests;
@@ -150,7 +150,7 @@ public class OP1 {
 			}
 
 			//solve
-
+/*
 			int length = 0;
 			if(cplex.solve())
 			{
@@ -174,10 +174,10 @@ public class OP1 {
 			double[] value = {nominalDistance-Tmax};
 
 			//util.ConnectR connection = new util.ConnectR();
-			for (int i=0; i<5; i++)
+			for (int i=0; i<2; i++)
 				PCV[i] = connection.connectToR(deviations,value,i+5);
             OV = cplex.getObjValue();
-/*
+*/
 			double[] MinPCV = {Double.MAX_VALUE,Double.MAX_VALUE,Double.MAX_VALUE,Double.MAX_VALUE,Double.MAX_VALUE};
 			int solIndex = 0;
 			if(cplex.populate()) {
@@ -202,7 +202,7 @@ public class OP1 {
 						double[] deviations = ReadData.getDeviations(arcs, length);
 						double[] value = {nominalDistance- ReadData.Tmax};
 
-						for (int i=0; i<5; i++)
+						for (int i=0; i<2; i++)
 							PCV[i] = connection.connectToR(deviations,value,i+5);
 					}
 
@@ -217,7 +217,7 @@ public class OP1 {
 
 			OV = cplex.getObjValue();
 			PCV = MinPCV;
-*/
+
 
 			System.out.println("Gamma: " + Gamma);
 			System.out.println();
