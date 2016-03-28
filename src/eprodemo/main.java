@@ -21,18 +21,18 @@ public class main {
         ConnectR connection = new ConnectR();
         int mNum = 6;
         int distributionNum = 5;
-        int num = 20;
+        int num = 11;
         double[] Gamma = new double[num];
         double[] rho = new double[num];
         double[] rsDe = new double[num];
 
         for (int i = 0; i < Gamma.length; i++) {
-            //Gamma[i] = (double) i / (Gamma.length - 1) * 23.7;
-            //rho[i] = (double) i / (Gamma.length - 1)* 10.87;
-            //rsDe[i] = (double) i / (Gamma.length - 1) * 6;
+            //Gamma[i] = (double) i / (Gamma.length - 1) * 20;
+            //rho[i] = (double) i / (Gamma.length - 1)* 10;
+            //rsDe[i] = (double) i / (Gamma.length - 1) * 10;
 
-            Gamma[i] = (double) i / (Gamma.length - 1) * 1;
-            rho[i] = (double) i / (Gamma.length - 1)* 2.07;
+            Gamma[i] = (double) i / (Gamma.length - 1) * 2;
+            rho[i] = (double) i / (Gamma.length - 1)* 1.5;
             rsDe[i] = (double) i / (Gamma.length - 1);
         }
         //Gamma[0] = 20;
@@ -79,7 +79,7 @@ public class main {
             }
 
             String BSFile = head + "model1_" + seed + tail;
-            String BNFile = head + "BN_" + seed + tail;
+            String BNFile = head + "model2_" + seed + tail;
             String KPFile = head + "model_" + seed + tail;
 
 
@@ -98,10 +98,10 @@ public class main {
             connection.transferDataToR(BSparam, BSOV, BSPCV, BSFile);
 
 
-/*
+
             zeroCount = 0;
             for (int i = 0; i < rho.length; i++) {
-                pair = BNPP.BN(rho[i], connection);
+                pair = model2.BN(rho[i], connection);
                 BNparam[i] = rho[i];
                 BNOV[i] = pair[0];
                 for (int j=0; j<distributionNum; j++) {
@@ -112,7 +112,7 @@ public class main {
             }
             connection.transferDataToR(BNparam, BNOV, BNPCV, BNFile);
 
-*/
+
 
             zeroCount = 0;
             for (int i = 0; i < rsDe.length; i++) {
@@ -129,7 +129,7 @@ public class main {
 /*
             zeroCount = 0;
             for (int i = 0; i < Gamma.length; i++) {
-                pair = PP1.PP1(Gamma[i], connection);
+                pair = model11.BS(Gamma[i], connection);
                 BSparam[i] = Gamma[i];
                 BSOV[i] = pair[0];
                 for (int j=0; j<distributionNum; j++) {
@@ -142,7 +142,7 @@ public class main {
 
             zeroCount = 0;
             for (int i = 0; i < rho.length; i++) {
-                pair = PP2.PP2(rho[i], connection);
+                pair = model22.BN(rho[i], connection);
                 BNparam[i] = rho[i];
                 BNOV[i] = pair[0];
                 for (int j=0; j<distributionNum; j++) {

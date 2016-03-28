@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class model1 {
+public class model11 {
 
 	public static List<Integer> Items = new LinkedList<>();
 	
@@ -34,7 +34,6 @@ public class model1 {
 			//
 			//IloNumVar[] x = cplex.boolVarArray(n);
 			IloNumVar[] x = cplex.numVarArray(n, 0, Double.MAX_VALUE);
-			IloNumVar[] p = cplex.numVarArray(n,0,Double.MAX_VALUE);
 
 			IloNumVar zz = cplex.numVar(0,Double.MAX_VALUE);
 			//objective
@@ -60,7 +59,6 @@ public class model1 {
 			for(int i=0; i<n; i++)
 			{
 				constraint.addTerm(c[i], x[i]);
-				constraint.addTerm(1,p[i]);
 			}
 			constraint.addTerm(Gamma,zz);
 			cplex.addLe(constraint, 2.5);
@@ -68,7 +66,6 @@ public class model1 {
 			for(int i=0; i<n; i++)
 			{
 				constraint = cplex.linearNumExpr();
-				constraint.addTerm(1, p[i]);
 				constraint.addTerm(-d[i],x[i]);
 				constraint.addTerm(1,zz);
 				cplex.addGe(constraint,0);
@@ -135,8 +132,8 @@ public class model1 {
 			//	System.out.println("deviations " + deviations[i]);
 
 			//ConnectR connection = new ConnectR();
-			for (int i=0; i<1; i++)
-				PCV[i] = connection.connectToR(deviations,value,i);
+			for (int i=0; i<2; i++)
+				PCV[i] = connection.connectToR(deviations,value,i+5);
 
 			for(int i=0; i<n; i++) {
 				OV += cplex.getValue(x[i]);
@@ -170,6 +167,6 @@ public class model1 {
 
 	public static void main(String[] args) throws IOException, REXPMismatchException, REngineException {
 		ConnectR connection = new ConnectR();
-		BS(1, connection);
+		BS(0.5, connection);
 	}
 }

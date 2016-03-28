@@ -47,12 +47,12 @@ public class CheckBSPP {
 			IloLinearNumExpr obj = cplex.linearNumExpr();
 
 			for(int i=0; i<n; i++) {
-				obj.addTerm(C[i], x[i]);
+				obj.addTerm(-C[i], x[i]);
 				obj.addTerm(-V[i],y[i]);
 				obj.addTerm(1,p[i]);
 				//obj.addTerm(-theta*(0.25*C[i]*C[i]), x[i]);
 			}
-			obj.addTerm(-Gamma,zz);
+			obj.addTerm(Gamma,zz);
 			cplex.addMaximize(obj);
 
 			//constraints
@@ -63,7 +63,7 @@ public class CheckBSPP {
 			for(int i=0; i<n; i++) {
 				constraint.addTerm(P[i], z[i]);
 			}
-			cplex.addGe(constraint,2340125.0);
+			cplex.addGe(constraint,2772090.909090909);
 
 			for(int i=0; i<n; i++)
 			{
@@ -196,6 +196,6 @@ public class CheckBSPP {
 
 	public static void main(String[] args) throws IOException, REXPMismatchException, REngineException {
 		ConnectR connection = new ConnectR();
-		BS(4.613, connection);
+		BS(0.4, connection);
 	}
 }

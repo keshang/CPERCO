@@ -114,7 +114,7 @@ public class BSPP {
 			if(cplex.solve())
 			{
 				for(int i=0; i<n; i++) {
-					//System.out.println("x :" + cplex.getValue(x[i]));
+					System.out.println("x :" + cplex.getValue(x[i]));
 					//System.out.println("y :" + cplex.getValue(y[i]));
 					if (cplex.getValue(x[i]) > 0.1) {
 						length++;
@@ -188,6 +188,6 @@ public class BSPP {
 
 	public static void main(String[] args) throws IOException, REXPMismatchException, REngineException {
 		ConnectR connection = new ConnectR();
-		BS(4.62, connection);
+		BS(0.4, connection);
 	}
 }

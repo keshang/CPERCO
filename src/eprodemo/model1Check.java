@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class model1 {
+public class model1Check {
 
 	public static List<Integer> Items = new LinkedList<>();
 	
@@ -41,10 +41,10 @@ public class model1 {
 			IloLinearNumExpr obj = cplex.linearNumExpr();
 
 			for(int i=0; i<n; i++) {
-				obj.addTerm(1,x[i]);
+				//obj.addTerm(1,x[i]);
 
 			}
-			//obj.addTerm(1,x[0]);
+			obj.addTerm(-1,x[0]);
 			cplex.addMaximize(obj);
 
 
@@ -52,7 +52,13 @@ public class model1 {
 			//constraints
 			//0
 			IloLinearNumExpr constraint, constraint1;
+			constraint = cplex.linearNumExpr();
+			for(int i=0; i<n; i++) {
+				constraint.addTerm(1,x[i]);
 
+
+			}
+			cplex.addGe(constraint,2.212389380530974);
 			//1
 			constraint = cplex.linearNumExpr();
 
@@ -143,7 +149,7 @@ public class model1 {
 				//obj.addTerm(P[i], z[i]);
 			}
 
-			OV = cplex.getObjValue();
+			//OV = cplex.getObjValue();
 
 
 			System.out.println("Gamma: " + Gamma);

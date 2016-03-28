@@ -184,6 +184,6 @@ public class PP {
 
 	public static void main(String[] args) throws IOException, REXPMismatchException, REngineException {
 		ConnectR connection = new ConnectR();
-		PP(6, connection);
+		PP(4.61, connection);
 	}
 }

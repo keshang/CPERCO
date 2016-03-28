@@ -3,6 +3,7 @@ package eprodemo;
 import ilog.concert.IloException;
 import ilog.concert.IloLinearNumExpr;
 import ilog.concert.IloNumVar;
+import ilog.concert.IloQuadNumExpr;
 import ilog.cplex.IloCplex;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
@@ -12,11 +13,11 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class model1 {
+public class model22 {
 
 	public static List<Integer> Items = new LinkedList<>();
 	
-	public static double[] BS(double Gamma, ConnectR connection) throws IOException, REXPMismatchException, REngineException {
+	public static double[] BN(double rho, ConnectR connection) throws IOException, REXPMismatchException, REngineException {
         double OV = 0;
 		double[] PCV = {0,0,0,0,0};
         try {
@@ -26,7 +27,7 @@ public class model1 {
 			//cplex.setOut(null);
 
 			int n = 2;
-			double theta = 0.00001;
+			double theta = 0.01;
 			double a[] = {2,1};
 			double b[] = {1,2};
 			double c[] = {1,1.01};
@@ -34,24 +35,24 @@ public class model1 {
 			//
 			//IloNumVar[] x = cplex.boolVarArray(n);
 			IloNumVar[] x = cplex.numVarArray(n, 0, Double.MAX_VALUE);
-			IloNumVar[] p = cplex.numVarArray(n,0,Double.MAX_VALUE);
-
-			IloNumVar zz = cplex.numVar(0,Double.MAX_VALUE);
+			IloNumVar zz = cplex.numVar(0.0,Double.MAX_VALUE);
 			//objective
 			IloLinearNumExpr obj = cplex.linearNumExpr();
 
 			for(int i=0; i<n; i++) {
-				obj.addTerm(1,x[i]);
+						obj.addTerm(1,x[i]);
+				//obj.addTerm(-theta*b[i], x[i]);
+				//obj.addTerm(-theta*epsilon*d[i],x[i]);
 
 			}
 			//obj.addTerm(1,x[0]);
 			cplex.addMaximize(obj);
 
-
-
 			//constraints
 			//0
 			IloLinearNumExpr constraint, constraint1;
+			IloQuadNumExpr constraint3;
+
 
 			//1
 			constraint = cplex.linearNumExpr();
@@ -59,20 +60,24 @@ public class model1 {
 
 			for(int i=0; i<n; i++)
 			{
-				constraint.addTerm(c[i], x[i]);
-				constraint.addTerm(1,p[i]);
+					constraint.addTerm(c[i], x[i]);
 			}
-			constraint.addTerm(Gamma,zz);
+			//constraint.addTerm(Gamma,z);
+			constraint.addTerm(rho,zz);
 			cplex.addLe(constraint, 2.5);
+
+
+			constraint3 = cplex.quadNumExpr();
 
 			for(int i=0; i<n; i++)
 			{
-				constraint = cplex.linearNumExpr();
-				constraint.addTerm(1, p[i]);
-				constraint.addTerm(-d[i],x[i]);
-				constraint.addTerm(1,zz);
-				cplex.addGe(constraint,0);
+				constraint3.addTerm(d[i]*d[i],x[i],x[i]);
 			}
+
+			constraint3.addTerm(-1, zz, zz);
+
+			cplex.addLe(constraint3,0);
+
 
 			//5
 			constraint = cplex.linearNumExpr();
@@ -81,17 +86,12 @@ public class model1 {
 				constraint.addTerm(b[i], x[i]);
 			}
 			cplex.addLe(constraint, 4);
-
 			constraint = cplex.linearNumExpr();
 			for(int i=0; i<n; i++)
 			{
 				constraint.addTerm(a[i], x[i]);
 			}
 			cplex.addLe(constraint, 4);
-
-
-			//5
-
 
 			//solve
 			int length = 0;
@@ -135,18 +135,18 @@ public class model1 {
 			//	System.out.println("deviations " + deviations[i]);
 
 			//ConnectR connection = new ConnectR();
-			for (int i=0; i<1; i++)
-				PCV[i] = connection.connectToR(deviations,value,i);
+			for (int i=0; i<2; i++)
+				PCV[i] = connection.connectToR(deviations,value,i+5);
 
 			for(int i=0; i<n; i++) {
 				OV += cplex.getValue(x[i]);
 				//obj.addTerm(P[i], z[i]);
 			}
 
-			OV = cplex.getObjValue();
+            //OV = cplex.getObjValue();
 
 
-			System.out.println("Gamma: " + Gamma);
+			System.out.println("rho: " + rho);
 			System.out.println();
 			System.out.println("Objective Value: " + OV);
 			System.out.println();
@@ -158,7 +158,7 @@ public class model1 {
 			//System.out.println("robust distance: " + orienteering.ReadData.robustDis(arcs));
 			//end
 			cplex.end();
-
+			
 		} catch (IloException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -168,8 +168,9 @@ public class model1 {
         return pair;
 	}
 
+
 	public static void main(String[] args) throws IOException, REXPMismatchException, REngineException {
 		ConnectR connection = new ConnectR();
-		BS(1, connection);
+		BN(0.27, connection);
 	}
 }

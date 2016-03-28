@@ -26,9 +26,11 @@ public class model {
 			//cplex.setOut(null);
 
 			int n = 2;
-			double theta = 0.00001;
+			double theta = 0.01;
 			double a[] = {2,1};
 			double b[] = {1,2};
+			double c[] = {1,1.01};
+			double d[] = {0.25,0.25};
 			//
 			//IloNumVar[] x = cplex.boolVarArray(n);
 			IloNumVar[] x = cplex.numVarArray(n, 0, Double.MAX_VALUE);
@@ -36,11 +38,13 @@ public class model {
 			//objective
 			IloLinearNumExpr obj = cplex.linearNumExpr();
 
-			//for(int i=0; i<n; i++) {
-			//			obj.addTerm(1,x[i]);
+			for(int i=0; i<n; i++) {
+						obj.addTerm(1,x[i]);
+				//obj.addTerm(-theta*b[i], x[i]);
+				//obj.addTerm(-theta*epsilon*d[i],x[i]);
 
-			//}
-			obj.addTerm(1,x[1]);
+			}
+			//obj.addTerm(1,x[0]);
 			cplex.addMaximize(obj);
 
 			//constraints
@@ -53,19 +57,25 @@ public class model {
 
 			for(int i=0; i<n; i++)
 			{
-					constraint.addTerm(a[i], x[i]);
-					constraint.addTerm(epsilon,x[i]);
+					constraint.addTerm(c[i], x[i]);
+					constraint.addTerm(epsilon*d[i],x[i]);
 			}
 			//constraint.addTerm(Gamma,z);
-			cplex.addLe(constraint, 5);
+			cplex.addLe(constraint, 2.5);
 
 			//5
-			//constraint = cplex.linearNumExpr();
-			//for(int i=0; i<n; i++)
-			//{
-			//	constraint.addTerm(b[i], x[i]);
-			//}
-			//cplex.addLe(constraint, 5);
+			constraint = cplex.linearNumExpr();
+			for(int i=0; i<n; i++)
+			{
+				constraint.addTerm(b[i], x[i]);
+			}
+			cplex.addLe(constraint, 4);
+			constraint = cplex.linearNumExpr();
+			for(int i=0; i<n; i++)
+			{
+				constraint.addTerm(a[i], x[i]);
+			}
+			cplex.addLe(constraint, 4);
 
 			//solve
 			int length = 0;
@@ -87,7 +97,7 @@ public class model {
 			double dis = 0;
 			double[] deviations = new double[length];
 			for(int i=0; i<n; i++) {
-				dis += cplex.getValue(x[i])*a[i];
+				dis += cplex.getValue(x[i])*c[i];
 				//deviations[i] = 0.5*C[i]*cplex.getValue(x[i]);
 				//System.out.println(deviations[i]);
 			}
@@ -95,14 +105,14 @@ public class model {
 			//double[] deviations = new double[length];
 			int index = 0;
 			for(Integer arc : Items) {
-				deviations[index] = cplex.getValue(x[arc]);
+				deviations[index] = cplex.getValue(x[arc])*d[arc];
 				//System.out.println(cplex.getValue(x[arc]));
 				index++;
 			}
 
 			//double nominalDistance = nominalDis(cplex);
 			//double[] deviations = KPData.getDeviations(Items, length);
-			double[] value = {dis - 5};
+			double[] value = {dis - 2.5};
 
 			//System.out.println("value" + value[0]);
 			//for(int i=0; i<length; i++)
@@ -117,7 +127,7 @@ public class model {
 				//obj.addTerm(P[i], z[i]);
 			}
 
-            OV = cplex.getObjValue();
+            //OV = cplex.getObjValue();
 
 
 			System.out.println("epsilon: " + epsilon);
@@ -145,6 +155,6 @@ public class model {
 
 	public static void main(String[] args) throws IOException, REXPMismatchException, REngineException {
 		ConnectR connection = new ConnectR();
-		PP(1, connection);
+		PP(0.5, connection);
 	}
 }

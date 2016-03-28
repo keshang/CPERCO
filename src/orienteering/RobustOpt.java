@@ -56,7 +56,7 @@ public class RobustOpt {
         double[] pair;
         int zeroCount = 0;
 
-        for (int seed = 1; seed < 2; seed++) {
+        for (int seed = 11; seed < 12; seed++) {
 
             for (int i = 0; i < Gamma.length; i++) {
                 BSparam[i] = Double.NaN;
@@ -115,7 +115,7 @@ public class RobustOpt {
             connection.transferDataToR(BSparam, BSOV, BSPCV, BSFile);
 */
             zeroCount = 0;
-            //rho[0] = 3.2;
+            rho[0] = 3.3;
             for (int i = 0; i < rho.length; i++) {
                 pair = orienteering.BNMODEL.BN(rho[i], connection);
                 BNparam[i] = rho[i];
@@ -123,7 +123,7 @@ public class RobustOpt {
                 for (int j=0; j<distributionNum; j++) {
                     BNPCV[j][i] = pair[j+1];
                 }
-                //break;
+                break;
             }
             connection.transferDataToR(BNparam, BNOV, BNPCV, BNFile);
 
